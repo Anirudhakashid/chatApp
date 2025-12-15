@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 3000;
 // getting the correct directory name
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log(__dirname);
 
 //routes
 app.use("/api/auth", authRoutes);
