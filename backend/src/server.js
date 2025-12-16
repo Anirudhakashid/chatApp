@@ -4,12 +4,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.route.js";
 import sendRoutes from "./routes/message.route.js";
+import { connectDB } from "./lib/db.js";
 
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
+app.use(express.json()); // for req.body
 
 // getting the correct directory name
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +22,18 @@ const __dirname = path.dirname(__filename);
 app.use("/api/auth", authRoutes);
 app.use("/api/message", sendRoutes);
 
-// Serve static files in production (deplyoment) from the backend
+//global error handler middleware for handling err from the controllers
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message: err.message || "Internal Server Error",
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }), // include stack trace in development mode
+  });
+});
+
+// Serve static files in production (deployment) from the backend
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
@@ -31,4 +45,5 @@ if (process.env.NODE_ENV === "production") {
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
+  connectDB();
 });
