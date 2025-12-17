@@ -1,11 +1,12 @@
 import jwt from "jsonwebtoken";
+import { ENV } from "../lib/env.js";
 
 export const generateToken = (userId, res) => {
-  if (!process.env.JWT_SECRET) {
+  if (!ENV.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
   }
 
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ userId }, ENV.JWT_SECRET, {
     expiresIn: "7d",
   });
 
@@ -13,7 +14,7 @@ export const generateToken = (userId, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000, //in ms
     httpOnly: true, //prevent XSS attacks
     sameSite: "strict", //CSRF protection
-    secure: process.env.NODE_ENV === "production", //set to true only in production
+    secure: ENV.NODE_ENV === "production", //set to true only in production
   });
 
   return token;

@@ -1,17 +1,14 @@
 import express from "express";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.route.js";
 import sendRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
-
-dotenv.config();
+import { ENV } from "./lib/env.js";
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
-
+const PORT = ENV.PORT || 3000;
 app.use(express.json()); // for req.body
 
 // getting the correct directory name
@@ -29,12 +26,12 @@ app.use((err, req, res, next) => {
     success: false,
     statusCode,
     message: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }), // include stack trace in development mode
+    ...(ENV.NODE_ENV === "development" && { stack: err.stack }), // include stack trace in development mode
   });
 });
 
 // Serve static files in production (deployment) from the backend
-if (process.env.NODE_ENV === "production") {
+if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
   // For any other route, serve the index.html file

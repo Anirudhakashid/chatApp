@@ -4,6 +4,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { generateToken } from "../utils/generateToken.js";
 import User from "../models/user.models.js";
 import bcrypt from "bcryptjs";
+import { welcomeEmail } from "../emails/emailHandler.js";
+import { ENV } from "../lib/env.js";
 
 const signup = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -47,6 +49,18 @@ const signup = asyncHandler(async (req, res) => {
   delete userResponse.password;
 
   generateToken(user._id, res);
+
+  const emailResponse = await welcomeEmail(
+    userResponse.email,
+    userResponse.fullName,
+    ENV.CLIENT_URL
+  );
+
+  if (!emailResponse.id) {
+    throw new ApiError(500, "Failed to send welcome email");
+  } else {
+    console.log("Welcome email sent successfully to " + userResponse.email);
+  }
 
   return res
     .status(201)
