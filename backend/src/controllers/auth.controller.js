@@ -4,6 +4,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { generateToken } from "../utils/generateToken.js";
 import User from "../models/user.models.js";
 import bcrypt from "bcryptjs";
+import { welcomeEmail } from "../emails/emailHandler.js";
+import { ENV } from "../lib/env.js";
 
 const signup = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -34,12 +36,12 @@ const signup = asyncHandler(async (req, res) => {
 
   //hashing password before saving to database
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(trimmedData.password, salt);
 
   //create entry in the db
   const user = await User.create({
-    fullName,
-    email,
+    fullName: trimmedData.fullName,
+    email: trimmedData.email,
     password: hashedPassword,
   });
 
@@ -47,6 +49,16 @@ const signup = asyncHandler(async (req, res) => {
   delete userResponse.password;
 
   generateToken(user._id, res);
+
+  try {
+    await welcomeEmail(
+      userResponse.email,
+      userResponse.fullName,
+      ENV.CLIENT_URL
+    );
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+  }
 
   return res
     .status(201)
