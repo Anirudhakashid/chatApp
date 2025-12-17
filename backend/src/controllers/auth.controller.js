@@ -65,4 +65,50 @@ const signup = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, userResponse, "User created successfully"));
 });
 
-export { signup };
+const login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const trimmedData = {
+    email: email?.trim()?.toLowerCase(),
+    password: password?.trim(),
+  };
+
+  if (!trimmedData.email || !trimmedData.password) {
+    throw new ApiError(400, "All fields are necessary");
+  }
+
+  const user = await User.findOne({ email: trimmedData.email });
+  if (!user) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    trimmedData.password,
+    user.password
+  );
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  generateToken(user._id, res);
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+      },
+      "Login successful"
+    )
+  );
+});
+
+const logout = asyncHandler((_, res) => {
+  res.cookie("jwt", "", { maxAge: 0 });
+  return res.status(200).json(new ApiResponse(200, {}, "Logout successfully"));
+});
+
+export { signup, login, logout };
