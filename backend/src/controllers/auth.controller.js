@@ -6,6 +6,7 @@ import User from "../models/user.models.js";
 import bcrypt from "bcryptjs";
 import { welcomeEmail } from "../emails/emailHandler.js";
 import { ENV } from "../lib/env.js";
+import cloudinary from "../lib/cloudinary.js";
 
 const signup = asyncHandler(async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -111,4 +112,31 @@ const logout = asyncHandler((_, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Logout successfully"));
 });
 
-export { signup, login, logout };
+const updateProfile = asyncHandler(async (req, res) => {
+  const { profilePic } = req.body;
+  if (!profilePic) {
+    throw new ApiError(400, "Profile picture is required");
+  }
+
+  //base64 image check
+  const base64Pattern = /^data:image\/(png|jpeg|jpg|gif|webp);base64,/;
+  if (!base64Pattern.test(profilePic)) {
+    throw new ApiError(400, "Invalid image format");
+  }
+
+  const userId = req.user._id;
+
+  const uploadResponse = await cloudinary.uploader.upload(profilePic);
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { profilePic: uploadResponse.secure_url },
+    { new: true }
+  );
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "Profile updated successfully"));
+});
+
+export { signup, login, logout, updateProfile };

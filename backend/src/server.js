@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.route.js";
@@ -9,7 +10,9 @@ import { ENV } from "./lib/env.js";
 const app = express();
 
 const PORT = ENV.PORT || 3000;
+
 app.use(express.json()); // for req.body
+app.use(cookieParser());
 
 // getting the correct directory name
 const __filename = fileURLToPath(import.meta.url);
