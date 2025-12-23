@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.route.js";
-import sendRoutes from "./routes/message.route.js";
+import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 
@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 
 //routes
 app.use("/api/auth", authRoutes);
-app.use("/api/message", sendRoutes);
+app.use("/api/message", messageRoutes);
 
 //global error handler middleware for handling err from the controllers
 app.use((err, req, res, next) => {
