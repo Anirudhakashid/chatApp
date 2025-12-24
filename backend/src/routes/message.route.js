@@ -16,7 +16,7 @@ router.use(arcjetProtection, verifyJWT);
 
 router.get("/contacts", getAllContacts);
 router.get("/chats", getAllChats);
-router.get("/:id", validateObjectId("id"), getMessagesByUserId);
-router.post("/send/:id", validateObjectId("id"), sendMessage);
+router.get("/:id", getMessagesByUserId);
+router.post("/send/:id", sendMessage);
 
 export default router;
