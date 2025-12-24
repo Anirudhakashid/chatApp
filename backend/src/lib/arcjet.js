@@ -12,6 +12,7 @@ const aj = arcjet({
       // Block all bots except the following
       allow: [
         "CATEGORY:SEARCH_ENGINE", // Google, Bing, etc
+        "POSTMAN",
       ],
     }),
     // Create a sliding window rate limit.
