@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Mail, Lock } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { loginSchema } from "../schemas/authSchema";
 
@@ -82,17 +83,23 @@ function LoginPage() {
             <label className="block text-white text-sm font-medium mb-2">
               Email
             </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="name@company.com"
-              aria-invalid={!!errors.email}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              className={`w-full bg-[#1e1f24] border ${
-                errors.email ? "border-red-500" : "border-gray-700"
-              } text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
-              {...register("email")}
-            />
+            <div className="relative">
+              <Mail
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                size={20}
+              />
+              <input
+                id="email"
+                type="email"
+                placeholder="name@company.com"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? "email-error" : undefined}
+                className={`w-full bg-[#1e1f24] border ${
+                  errors.email ? "border-red-500" : "border-gray-700"
+                } text-white pl-11 pr-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
+                {...register("email")}
+              />
+            </div>
             {errors.email && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.email.message}
@@ -115,17 +122,25 @@ function LoginPage() {
                 Forgot password?
               </Link> */}
             </div>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? "password-error" : undefined}
-              className={`w-full bg-[#1e1f24] border ${
-                errors.password ? "border-red-500" : "border-gray-700"
-              } text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
-              {...register("password")}
-            />
+            <div className="relative">
+              <Lock
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                size={20}
+              />
+              <input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                aria-invalid={!!errors.password}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                className={`w-full bg-[#1e1f24] border ${
+                  errors.password ? "border-red-500" : "border-gray-700"
+                } text-white pl-11 pr-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
+                {...register("password")}
+              />
+            </div>
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.password.message}
