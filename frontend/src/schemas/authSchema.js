@@ -4,7 +4,11 @@ export const signupSchema = z.object({
   fullName: z
     .string()
     .min(2, "Name must be at least 2 characters")
-    .max(50, "Name too long"),
+    .max(50, "Name too long")
+    .regex(
+      /^[a-zA-Z\s'-]+$/,
+      "Name can only contain letters, spaces, hyphens, and apostrophes"
+    ),
 
   email: z.string().email("Please enter a valid email address").toLowerCase(),
 
@@ -18,4 +22,9 @@ export const signupSchema = z.object({
       /[^A-Za-z0-9]/,
       "Password must contain at least one special character"
     ),
+});
+
+export const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address").toLowerCase(),
+  password: z.string().min(1, "Password is required"),
 });

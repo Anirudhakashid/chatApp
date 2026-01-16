@@ -1,16 +1,23 @@
-import React, { useState } from "react";
 import { Link } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "../store/useAuthStore";
+import { loginSchema } from "../schemas/authSchema";
 
 function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { login, isLoggingIn } = useAuthStore();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log("Login:", { email, password });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(loginSchema), mode: "onBlur" });
+
+  const onSubmit = (data) => {
+    login(data);
   };
 
+  //TODO: Implement Google Sign-In
   const handleGoogleSignIn = () => {
     // Handle Google sign-in logic here
     console.log("Google sign-in");
@@ -69,20 +76,28 @@ function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
           <div className="mb-4">
             <label className="block text-white text-sm font-medium mb-2">
               Email
             </label>
             <input
+              id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               placeholder="name@company.com"
-              className="w-full bg-[#1e1f24] border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500"
-              required
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              className={`w-full bg-[#1e1f24] border ${
+                errors.email ? "border-red-500" : "border-gray-700"
+              } text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
+              {...register("email")}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Password Field */}
@@ -91,29 +106,47 @@ function LoginPage() {
               <label className="block text-white text-sm font-medium">
                 Password
               </label>
-              <Link
+
+              {/* //TODO: Implement Forgot Password Link */}
+              {/* <Link
                 to="/forgot-password"
                 className="text-blue-500 text-sm hover:underline"
               >
                 Forgot password?
-              </Link>
+              </Link> */}
             </div>
             <input
+              id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full bg-[#1e1f24] border border-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500"
-              required
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? "password-error" : undefined}
+              className={`w-full bg-[#1e1f24] border ${
+                errors.password ? "border-red-500" : "border-gray-700"
+              } text-white px-4 py-3 rounded-lg focus:outline-none focus:border-gray-600 placeholder-gray-500`}
+              {...register("password")}
             />
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           {/* Login Button */}
           <button
             type="submit"
+            disabled={isLoggingIn}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors mb-6"
           >
-            Log in
+            {isLoggingIn ? (
+              <div className="flex justify-center items-center gap-2">
+                Logging in
+                <span className="loading loading-dots loading-sm"></span>
+              </div>
+            ) : (
+              "Log in"
+            )}
           </button>
         </form>
 
