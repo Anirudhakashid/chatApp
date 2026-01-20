@@ -4,18 +4,22 @@ import toast from "react-hot-toast";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
-  isCheckingAuth: true,
+  isCheckingAuth: false,
   isSigningIn: false,
   isLoggingIn: false,
+  hasCheckedAuth: false,
 
   checkAuth: async () => {
+    const { isCheckingAuth, hasCheckedAuth } = get();
+    if (isCheckingAuth || hasCheckedAuth) return;
+
     set({ isCheckingAuth: true });
     try {
       const res = await axiosInstance.get("/auth/check");
-      set({ authUser: res.data });
+      set({ authUser: res.data, hasCheckedAuth: true });
     } catch (error) {
       console.error("Error in auth Check:", error);
-      set({ authUser: null });
+      set({ authUser: null, hasCheckedAuth: true });
 
       if (error.response?.status !== 401) {
         toast.error("Connection error. Please try again later.");
