@@ -23,7 +23,7 @@ export const useChatStore = create((set, get) => ({
     set({ isUserLoading: true });
     try {
       const res = await axiosInstance.get("/message/contacts");
-      set({ allContacts: res.data });
+      set({ allContacts: res.data.data });
 
       toast.success("Contacts fetched successfully!");
     } catch (error) {
@@ -38,7 +38,7 @@ export const useChatStore = create((set, get) => ({
     set({ isUserLoading: true });
     try {
       const res = await axiosInstance.get("/message/chats");
-      set({ chats: res.data });
+      set({ chats: res.data.data });
 
       toast.success("Chats fetched Successfully!");
     } catch (error) {
