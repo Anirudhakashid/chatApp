@@ -9,7 +9,7 @@ function ChatList() {
 
   useEffect(() => {
     getChats();
-  }, []);
+  }, [getChats]);
 
   if (isUserLoading) {
     return <UsersLoadingSkeleton />;

@@ -8,7 +8,7 @@ function ContactList() {
 
   useEffect(() => {
     getAllContacts();
-  }, []);
+  }, [getAllContacts]);
 
   if (isUserLoading) {
     return <UsersLoadingSkeleton />;

@@ -19,7 +19,12 @@ export const useChatStore = create((set, get) => ({
     set({ selectedUser: user });
   },
 
-  getAllContacts: async () => {
+  getAllContacts: async (force = false) => {
+    const { allContacts, isUserLoading } = get();
+    if (!force && (isUserLoading || allContacts.length > 0)) {
+      return;
+    }
+
     set({ isUserLoading: true });
     try {
       const res = await axiosInstance.get("/message/contacts");
@@ -34,7 +39,12 @@ export const useChatStore = create((set, get) => ({
     }
   },
 
-  getChats: async () => {
+  getChats: async (force = false) => {
+    const { chats, isUserLoading } = get();
+    if (!force && (isUserLoading || chats.length > 0)) {
+      return;
+    }
+
     set({ isUserLoading: true });
     try {
       const res = await axiosInstance.get("/message/chats");
@@ -46,6 +56,18 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response?.data.message);
     } finally {
       set({ isUserLoading: false });
+    }
+  },
+
+  getMessagesByUserId: async (userId) => {
+    set({ isMessagesLoading: true });
+    try {
+      const res = await axiosInstance.get(`/message/${userId}`);
+      set({ messages: res.data.data });
+    } catch (error) {
+      toast.error(error.response?.data.message || "Something went Wrong!");
+    } finally {
+      set({ isMessagesLoading: false });
     }
   },
 }));
