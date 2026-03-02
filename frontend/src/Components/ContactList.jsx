@@ -3,8 +3,13 @@ import { useEffect } from "react";
 import UsersLoadingSkeleton from "./UserLoadingSkeleton";
 
 function ContactList() {
-  const { allContacts, isUserLoading, getAllContacts, setSelectedUser } =
-    useChatStore();
+  const {
+    allContacts,
+    isUserLoading,
+    getAllContacts,
+    setSelectedUser,
+    setActiveTab,
+  } = useChatStore();
 
   useEffect(() => {
     getAllContacts();
@@ -20,7 +25,10 @@ function ContactList() {
         <button
           key={contact._id}
           className="w-full text-left rounded-xl px-3 py-2 transition-colors hover:bg-white/5 active:bg-white/10"
-          onClick={() => setSelectedUser(contact)}
+          onClick={() => {
+            setSelectedUser(contact);
+            setActiveTab("chats");
+          }}
         >
           <div className="flex items-center gap-3">
             <div className="relative">

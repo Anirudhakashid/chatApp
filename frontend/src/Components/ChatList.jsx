@@ -8,7 +8,7 @@ function ChatList() {
     useChatStore();
 
   useEffect(() => {
-    getChats();
+    getChats(true);
   }, [getChats]);
 
   if (isUserLoading) {

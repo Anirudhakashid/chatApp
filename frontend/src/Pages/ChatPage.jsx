@@ -51,8 +51,8 @@ const ChatInterface = () => {
       </aside>
 
       {/* Main Chat Area - Right side */}
-      <main className="flex-1 flex flex-col h-full relative bg-[#0A0A0B] w-full">
-        <div className="flex-1 flex items-center justify-center">
+      <main className="flex-1 flex flex-col h-full relative bg-[#0A0A0B] w-full min-h-0">
+        <div className="flex-1 flex items-center justify-center min-h-0">
           {selectedUser ? <ChatContainer /> : <NoConvo />}
         </div>
 
