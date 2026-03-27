@@ -7,8 +7,7 @@ import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 import cors from "cors";
-
-const app = express();
+import { app, server } from "./lib/socket.js";
 
 const PORT = ENV.PORT || 3000;
 
@@ -19,21 +18,22 @@ app.use(cookieParser());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-//routes
-
 //Allowing frontend to send requests to backend server (CORS)
 app.use(
   cors({
     origin: ENV.CLIENT_URL,
     credentials: true,
-  })
+  }),
 );
+
+//routes
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
 //global error handler middleware for handling err from the controllers
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+
   res.status(statusCode).json({
     success: false,
     statusCode,
@@ -52,7 +52,7 @@ if (ENV.NODE_ENV === "production") {
   });
 }
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
   connectDB();
 });

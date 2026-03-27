@@ -1,8 +1,9 @@
 import { Send, PlusCircle, Smile, X } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { useChatStore } from "../store/useChatStore.js";
 import toast from "react-hot-toast";
-import EmojiPicker from "emoji-picker-react";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 function MessageInput() {
   const [text, setText] = useState("");
@@ -73,11 +74,11 @@ function MessageInput() {
 
   return (
     <>
-      <div className="bg-[#0F1115] border-t border-white/[0.06] p-3 md:p-5 lg:p-5 2xl:p-6 pb-4 md:pb-6 lg:pb-6 shrink-0">
+      <div className="bg-[#0F1115] border-t border-white/[0.06] p-2.5 md:p-5 lg:p-5 2xl:p-6 pb-safe shrink-0">
         <div className="w-full max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto">
-          <div className="bg-[#0A0A0B] border border-white/[0.06] rounded-lg flex flex-col shadow-sm focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 transition-all">
+          <div className="bg-[#0A0A0B] border border-white/[0.06] rounded-2xl flex flex-col shadow-sm focus-within:ring-2 focus-within:ring-blue-600 focus-within:border-blue-600 transition-all">
             {imagePreview && (
-              <div className="px-4 pt-3">
+              <div className="px-3 pt-3 sm:px-4">
                 <div className="relative inline-block">
                   <img
                     src={imagePreview}
@@ -102,12 +103,12 @@ function MessageInput() {
                   handleSend();
                 }
               }}
-              className="bg-transparent border-none text-white placeholder-gray-400 w-full focus:ring-0 focus:outline-none px-4 py-3 lg:px-4 lg:py-3.5 text-sm lg:text-base resize-none min-h-[48px] lg:min-h-[52px]"
+              className="bg-transparent border-none text-white placeholder-gray-400 w-full focus:ring-0 focus:outline-none px-3 py-3 sm:px-4 lg:py-3.5 text-sm lg:text-base resize-none min-h-[48px] lg:min-h-[52px]"
               placeholder={`Message to ${selectedUser.fullName}`}
               rows={1}
             />
-            <div className="flex items-center justify-between px-2 pb-2 lg:px-2.5 lg:pb-2.5">
-              <div className="flex items-center gap-1 lg:gap-1.5">
+            <div className="flex items-center justify-between px-2 pb-2 sm:px-2.5 sm:pb-2.5">
+              <div className="flex items-center gap-0.5 sm:gap-1.5">
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors"
@@ -129,23 +130,34 @@ function MessageInput() {
                     <Smile className="w-5 h-5 lg:w-5 lg:h-5" />
                   </button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-10 left-0 z-50">
-                      <EmojiPicker
-                        onEmojiClick={handleEmojiClick}
-                        theme="dark"
-                        width={300}
-                        height={400}
-                        searchDisabled={false}
-                        skinTonesDisabled
-                        previewConfig={{ showPreview: false }}
-                      />
+                    <div
+                      className="absolute bottom-12 left-0 z-50"
+                      style={{ maxWidth: "calc(100vw - 1.5rem)" }}
+                    >
+                      <Suspense
+                        fallback={
+                          <div className="rounded-xl border border-white/10 bg-[#11131a] px-4 py-3 text-sm text-white/60 shadow-[0_18px_40px_rgba(0,0,0,0.35)]">
+                            Loading emoji picker...
+                          </div>
+                        }
+                      >
+                        <EmojiPicker
+                          onEmojiClick={handleEmojiClick}
+                          theme="dark"
+                          width={280}
+                          height={360}
+                          searchDisabled={false}
+                          skinTonesDisabled
+                          previewConfig={{ showPreview: false }}
+                        />
+                      </Suspense>
                     </div>
                   )}
                 </div>
               </div>
               <button
                 onClick={handleSend}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 lg:p-2 rounded-lg transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-xl transition-colors"
               >
                 <Send className="w-5 h-5 lg:w-5 lg:h-5" />
               </button>

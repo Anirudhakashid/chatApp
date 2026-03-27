@@ -74,13 +74,12 @@ export const useChatStore = create((set, get) => ({
   },
 
   sendMessage: async (messageData) => {
-    //optimestic update
     const { authUser } = useAuthStore.getState();
-    const { messages, selectedUser } = get();
+    const { selectedUser } = get();
 
     const tempId = `temp-${Date.now()}`;
 
-    const optimesticMessage = {
+    const optimisticMessage = {
       _id: tempId,
       senderId: authUser._id,
       receiverId: selectedUser._id,
@@ -90,9 +89,9 @@ export const useChatStore = create((set, get) => ({
       isOptimistic: true,
     };
 
-    set({
-      messages: [...messages, optimesticMessage],
-    });
+    set((state) => ({
+      messages: [...state.messages, optimisticMessage],
+    }));
 
     try {
       const res = await axiosInstance.post(
@@ -100,16 +99,53 @@ export const useChatStore = create((set, get) => ({
         messageData,
       );
 
-      set({
-        messages: messages.concat(res.data.data),
-      });
+      set((state) => ({
+        messages: state.messages.map((message) =>
+          message._id === tempId ? res.data.data : message,
+        ),
+      }));
     } catch (error) {
       set((state) => ({
-        messages: state.messages
-          .filter((m) => m._id !== tempId)
-          .concat(res.data.data),
+        messages: state.messages.filter((message) => message._id !== tempId),
       }));
+
       toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  },
+
+  subscribeToMessages: () => {
+    const { selectedUser } = get();
+    const { socket, authUser } = useAuthStore.getState();
+
+    if (!selectedUser || !socket) {
+      return;
+    }
+
+    socket.off("newMessage");
+
+    socket.on("newMessage", (newMessage) => {
+      const isMessageForCurrentChat =
+        newMessage.senderId === selectedUser._id ||
+        (newMessage.senderId === authUser._id &&
+          newMessage.receiverId === selectedUser._id) ||
+        (newMessage.senderId === selectedUser._id &&
+          newMessage.receiverId === authUser._id);
+
+      if (!isMessageForCurrentChat) {
+        return;
+      }
+
+      set({
+        messages: [...get().messages, newMessage],
+      });
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const { socket } = useAuthStore.getState();
+
+    if (socket) {
+      socket.off("newMessage");
     }
   },
 }));

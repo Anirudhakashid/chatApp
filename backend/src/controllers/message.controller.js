@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import cloudinary from "../lib/cloudinary.js";
+import { io, getReceiverSocketId } from "../lib/socket.js";
 
 // get all contacts except logged in user from the database
 const getAllContacts = asyncHandler(async (req, res) => {
@@ -20,7 +21,7 @@ const getAllContacts = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, filteredUsers, "Contacts fetched successfully!")
+      new ApiResponse(200, filteredUsers, "Contacts fetched successfully!"),
     );
 });
 
@@ -94,7 +95,10 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   await newMessage.save();
 
-  //TODO: add socket.io to send real-time messages
+  const receiverSocketId = getReceiverSocketId(receiverId);
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("newMessage", newMessage);
+  }
 
   return res
     .status(201)

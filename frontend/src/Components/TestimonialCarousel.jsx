@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { testimonials } from "../data/testimonials.js";
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 const INTERVAL = 5000;
 
 export default function TestimonialCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const MotionDiv = motion.div;
+  const MotionButton = motion.button;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -22,7 +24,7 @@ export default function TestimonialCarousel() {
   return (
     <div className="relative h-full w-full bg-layout-surface border border-white/5 shadow-[0_8px_24px_rgba(0,0,0,0.35)] rounded-xl p-10 flex gap-3 flex-col justify-end overflow-hidden ">
       <AnimatePresence mode="wait">
-        <motion.div
+        <MotionDiv
           key={activeIndex}
           initial={{ x: 300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -40,13 +42,13 @@ export default function TestimonialCarousel() {
           <blockquote className="max-w-md text-lg leading-relaxed text-text-primary">
             "{active.quote}"
           </blockquote>
-        </motion.div>
+        </MotionDiv>
       </AnimatePresence>
 
       {/* Animated Indicators */}
       <div className="mt-6 flex gap-2 relative z-10">
         {testimonials.map((_, index) => (
-          <motion.button
+          <MotionButton
             key={index}
             className={`h-2 rounded-full cursor-pointer border-0 outline-none ${
               index === activeIndex ? "bg-primary" : "bg-base-content/30"
